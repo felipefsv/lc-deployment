@@ -97,64 +97,64 @@ spec:
         requests:
           storage: 2Gi
 
----
-# Deployment api
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: lc-api
-  namespace: lc
-  labels:
-    app: lc-api
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: lc-api
-  strategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        app: lc-api
-    spec:
-      containers:
-      - image: felipefsv/api-lc
-        name: lc-api
-        env:
-        - name: DB_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: lc-config
-              key: POSTGRES_DB_HOST
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: lc-secret
-              key: POSTGRES_DB_PASSWORD
-        - name: DB_USER
-          valueFrom:
-            configMapKeyRef:
-              name: lc-config
-              key: POSTGRES_DB_USER
-        - name: DB_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: lc-config
-              key: POSTGRES_DB_NAME
-        ports:
-        - hostPort: 8081
-          containerPort: 8081
-          name: lc-api
-        volumeMounts:
-        - name: api-persistent-storage
-          mountPath: /api/uploads
-        - name: api-persistent-storage
-          mountPath: /api/logs
-      volumes:
-      - name: api-persistent-storage
-        persistentVolumeClaim:
-          claimName: lc-pvc
+# ---
+# # Deployment api
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: lc-api
+#   namespace: lc
+#   labels:
+#     app: lc-api
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: lc-api
+#   strategy:
+#     type: RollingUpdate
+#   template:
+#     metadata:
+#       labels:
+#         app: lc-api
+#     spec:
+#       containers:
+#       - image: felipefsv/api-lc
+#         name: lc-api
+#         env:
+#         - name: DB_HOST
+#           valueFrom:
+#             configMapKeyRef:
+#               name: lc-config
+#               key: POSTGRES_DB_HOST
+#         - name: DB_PASSWORD
+#           valueFrom:
+#             secretKeyRef:
+#               name: lc-secret
+#               key: POSTGRES_DB_PASSWORD
+#         - name: DB_USER
+#           valueFrom:
+#             configMapKeyRef:
+#               name: lc-config
+#               key: POSTGRES_DB_USER
+#         - name: DB_NAME
+#           valueFrom:
+#             configMapKeyRef:
+#               name: lc-config
+#               key: POSTGRES_DB_NAME
+#         ports:
+#         - hostPort: 8081
+#           containerPort: 8081
+#           name: lc-api
+#         volumeMounts:
+#         - name: api-persistent-storage
+#           mountPath: /api/uploads
+#         - name: api-persistent-storage
+#           mountPath: /api/logs
+#       volumes:
+#       - name: api-persistent-storage
+#         persistentVolumeClaim:
+#           claimName: lc-pvc
   
 ---
 # Deployment admin
@@ -244,20 +244,20 @@ spec:
           containerPort: 80
           name: lc-oficina
 
----
-# Serviço para api
-apiVersion: v1
-kind: Service
-metadata:
-  name: lc-api-svc
-  namespace: lc
-spec:
-  clusterIP: None
-  selector:
-    app: lc-api
-  ports:
-  - port: 8081
-    targetPort: 8081
+# ---
+# # Serviço para api
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: lc-api-svc
+#   namespace: lc
+# spec:
+#   clusterIP: None
+#   selector:
+#     app: lc-api
+#   ports:
+#   - port: 8081
+#     targetPort: 8081
 
 ---
 # Serviço para admin
@@ -319,45 +319,45 @@ spec:
   - port: 5432
     targetPort: 5432
 
----
-# Ingress para web apps
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: lc-ingress
-  namespace: lc
-  labels:
-    app: lc-admin
-spec:
-  rules:
-  - host: "wp.18.211.103.145.sslip.io"
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: lc-admin-svc
-            port:
-              number: 80
-      - pathType: Prefix
-        path: /monitor
-        backend:
-          service:
-            name: lc-monitor-svc
-            port:
-              number: 81
-      - pathType: Prefix
-        path: /oficina
-        backend:
-          service:
-            name: lc-oficina-svc
-            port:
-              number: 82
-      - pathType: Prefix
-        path: /api
-        backend:
-          service:
-            name: lc-api-svc
-            port:
-              number: 8081
+# ---
+# # Ingress para web apps
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: lc-ingress
+#   namespace: lc
+#   labels:
+#     app: lc-admin
+# spec:
+#   rules:
+#   - host: "wp.18.211.103.145.sslip.io"
+#     http:
+#       paths:
+#       - pathType: Prefix
+#         path: /
+#         backend:
+#           service:
+#             name: lc-admin-svc
+#             port:
+#               number: 80
+#       - pathType: Prefix
+#         path: /monitor
+#         backend:
+#           service:
+#             name: lc-monitor-svc
+#             port:
+#               number: 81
+#       - pathType: Prefix
+#         path: /oficina
+#         backend:
+#           service:
+#             name: lc-oficina-svc
+#             port:
+#               number: 82
+#       - pathType: Prefix
+#         path: /api
+#         backend:
+#           service:
+#             name: lc-api-svc
+#             port:
+#               number: 8081
