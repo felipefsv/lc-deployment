@@ -181,8 +181,7 @@ spec:
       - image: felipefsv/admin-lc
         name: lc-admin
         ports:
-        - hostPort: 80
-          containerPort: 80
+        - containerPort: 80
           name: lc-admin
 
 ---
@@ -211,8 +210,7 @@ spec:
       - image: felipefsv/monitor-lc
         name: lc-monitor
         ports:
-        - hostPort: 81
-          containerPort: 80
+        - containerPort: 81
           name: lc-monitor
 
 ---
@@ -240,8 +238,7 @@ spec:
       - image: felipefsv/oficina-lc
         name: lc-oficina
         ports:
-        - hostPort: 82
-          containerPort: 80
+        - containerPort: 82
           name: lc-oficina
 
 # ---
