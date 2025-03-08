@@ -283,8 +283,8 @@ spec:
   selector:
     app: lc-monitor
   ports:
-  - port: 81
-    targetPort: 81
+  - port: 80
+    targetPort: 80
 
 ---
 # Serviço para oficina
@@ -298,8 +298,8 @@ spec:
   selector:
     app: lc-oficina
   ports:
-  - port: 82
-    targetPort: 82
+  - port: 80
+    targetPort: 80
 
 ---
 # Serviço Headless para Postgres
@@ -327,7 +327,7 @@ metadata:
     app: lc-admin
 spec:
   rules:
-  - host: "wp.18.211.103.145.sslip.io"
+  - host: "lc.18.211.103.145.sslip.io"
     http:
       paths:
       - pathType: Prefix
@@ -343,14 +343,14 @@ spec:
           service:
             name: lc-monitor-svc
             port:
-              number: 81
+              number: 80
       - pathType: Prefix
         path: /oficina
         backend:
           service:
             name: lc-oficina-svc
             port:
-              number: 82
+              number: 80
       # - pathType: Prefix
       #   path: /api
       #   backend:
