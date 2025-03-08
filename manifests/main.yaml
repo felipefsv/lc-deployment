@@ -264,7 +264,7 @@ spec:
   selector:
     app: lc-api
   ports:
-  - port: 80
+  - port: 8081
     targetPort: 8081
 
 ---
@@ -363,9 +363,9 @@ spec:
             port:
               number: 80
       - pathType: Prefix
-        path: /srv
+        path: /api/v1
         backend:
           service:
             name: lc-api-svc
             port:
-              number: 80
+              number: 8081
