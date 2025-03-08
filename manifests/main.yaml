@@ -316,45 +316,45 @@ spec:
   - port: 5432
     targetPort: 5432
 
-# ---
-# # Ingress para web apps
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: lc-ingress
-#   namespace: lc
-#   labels:
-#     app: lc-admin
-# spec:
-#   rules:
-#   - host: "wp.18.211.103.145.sslip.io"
-#     http:
-#       paths:
-#       - pathType: Prefix
-#         path: /
-#         backend:
-#           service:
-#             name: lc-admin-svc
-#             port:
-#               number: 80
-#       - pathType: Prefix
-#         path: /monitor
-#         backend:
-#           service:
-#             name: lc-monitor-svc
-#             port:
-#               number: 81
-#       - pathType: Prefix
-#         path: /oficina
-#         backend:
-#           service:
-#             name: lc-oficina-svc
-#             port:
-#               number: 82
-#       - pathType: Prefix
-#         path: /api
-#         backend:
-#           service:
-#             name: lc-api-svc
-#             port:
-#               number: 8081
+---
+# Ingress para web apps
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lc-ingress
+  namespace: lc
+  labels:
+    app: lc-admin
+spec:
+  rules:
+  - host: "wp.18.211.103.145.sslip.io"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: lc-admin-svc
+            port:
+              number: 80
+      # - pathType: Prefix
+      #   path: /monitor
+      #   backend:
+      #     service:
+      #       name: lc-monitor-svc
+      #       port:
+      #         number: 81
+      # - pathType: Prefix
+      #   path: /oficina
+      #   backend:
+      #     service:
+      #       name: lc-oficina-svc
+      #       port:
+      #         number: 82
+      # - pathType: Prefix
+      #   path: /api
+      #   backend:
+      #     service:
+      #       name: lc-api-svc
+      #       port:
+      #         number: 8081
