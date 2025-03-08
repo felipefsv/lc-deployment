@@ -337,7 +337,7 @@ metadata:
     app: lc-admin
 spec:
   rules:
-  - host: "lc.18.211.103.145.sslip.io"
+  - host: "lc.3.226.57.96.sslip.io"
     http:
       paths:
       - pathType: Prefix
