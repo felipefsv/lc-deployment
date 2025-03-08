@@ -43,6 +43,21 @@ spec:
   storageClassName: longhorn
 
 ---
+# PersistentVolumeClaim para api (logs e uploads)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: api-pvc
+  namespace: lc
+spec:
+  resources:
+    requests:
+      storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+
+---
 # StatefulSet do Postgres
 apiVersion: apps/v1
 kind: StatefulSet
@@ -92,74 +107,65 @@ spec:
         - name: postgres-persistent-storage
           persistentVolumeClaim:
             claimName: postgres-pvc
-  # volumeClaimTemplates:
-  # - metadata:
-  #     name: postgres-persistent-storage
-  #   spec:
-  #     accessModes: [ "ReadWriteOnce" ]
-  #     storageClassName: "longhorn"
-  #     resources:
-  #       requests:
-  #         storage: 1Gi
 
-# ---
-# # Deployment api
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: lc-api
-#   namespace: lc
-#   labels:
-#     app: lc-api
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: lc-api
-#   strategy:
-#     type: RollingUpdate
-#   template:
-#     metadata:
-#       labels:
-#         app: lc-api
-#     spec:
-#       containers:
-#       - image: felipefsv/api-lc
-#         name: lc-api
-#         env:
-#         - name: DB_HOST
-#           valueFrom:
-#             configMapKeyRef:
-#               name: lc-config
-#               key: POSTGRES_DB_HOST
-#         - name: DB_PASSWORD
-#           valueFrom:
-#             secretKeyRef:
-#               name: lc-secret
-#               key: POSTGRES_DB_PASSWORD
-#         - name: DB_USER
-#           valueFrom:
-#             configMapKeyRef:
-#               name: lc-config
-#               key: POSTGRES_DB_USER
-#         - name: DB_NAME
-#           valueFrom:
-#             configMapKeyRef:
-#               name: lc-config
-#               key: POSTGRES_DB_NAME
-#         ports:
-#         - hostPort: 8081
-#           containerPort: 8081
-#           name: lc-api
-#         volumeMounts:
-#         - name: api-persistent-storage
-#           mountPath: /api/uploads
-#         - name: api-persistent-storage
-#           mountPath: /api/logs
-#       volumes:
-#       - name: api-persistent-storage
-#         persistentVolumeClaim:
-#           claimName: lc-pvc
+---
+# Deployment api
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lc-api
+  namespace: lc
+  labels:
+    app: lc-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lc-api
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lc-api
+    spec:
+      containers:
+      - image: felipefsv/api-lc
+        name: lc-api
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_HOST
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: lc-secret
+              key: POSTGRES_DB_PASSWORD
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_USER
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_NAME
+        ports:
+        - hostPort: 8081
+          containerPort: 8081
+          name: lc-api
+        volumeMounts:
+        - name: api-persistent-storage
+          mountPath: /uploads
+        - name: api-persistent-storage
+          mountPath: /logs
+      volumes:
+      - name: api-persistent-storage
+        persistentVolumeClaim:
+          claimName: api-pvc
   
 ---
 # Deployment admin
