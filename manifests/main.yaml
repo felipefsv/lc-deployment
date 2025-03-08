@@ -154,8 +154,7 @@ spec:
               name: lc-config
               key: POSTGRES_DB_NAME
         ports:
-        - hostPort: 8081
-          containerPort: 8081
+        - containerPort: 8081
           name: lc-api
         volumeMounts:
         - name: api-persistent-storage
