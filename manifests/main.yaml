@@ -86,18 +86,7 @@ spec:
               key: POSTGRES_DB_PASSWORD
         volumeMounts:
           - name: postgres-persistent-storage
-            mountPath: /var/lib/postgresql/data/pgdata
-        command:
-          - "sh"
-          - "-c"
-          - |
-            if [ ! -s /var/lib/postgresql/data/pgdata/PG_VERSION ]; then
-              initdb -D /var/lib/postgresql/data/pgdata;
-            fi;
-            exec postgres -D /var/lib/postgresql/data/pgdata
-        securityContext:
-          runAsUser: 999
-          runAsGroup: 999 
+            mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
   - metadata:
       name: postgres-persistent-storage
