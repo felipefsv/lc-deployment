@@ -252,20 +252,20 @@ spec:
         - containerPort: 82
           name: lc-oficina
 
-# ---
-# # Serviço para api
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: lc-api-svc
-#   namespace: lc
-# spec:
-#   clusterIP: None
-#   selector:
-#     app: lc-api
-#   ports:
-#   - port: 8081
-#     targetPort: 8081
+---
+# Serviço para api
+apiVersion: v1
+kind: Service
+metadata:
+  name: lc-api-svc
+  namespace: lc
+spec:
+  clusterIP: None
+  selector:
+    app: lc-api
+  ports:
+  - port: 8081
+    targetPort: 8081
 
 ---
 # Serviço para admin
@@ -362,10 +362,10 @@ spec:
             name: lc-oficina-svc
             port:
               number: 80
-      # - pathType: Prefix
-      #   path: /api
-      #   backend:
-      #     service:
-      #       name: lc-api-svc
-      #       port:
-      #         number: 8081
+      - pathType: Prefix
+        path: /api
+        backend:
+          service:
+            name: lc-api-svc
+            port:
+              number: 8081
