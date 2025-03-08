@@ -83,6 +83,14 @@ spec:
         ports:
         - containerPort: 5432
           name: postgres-svc
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pg_isready -U postgres -d lc_enrolamentos_os_DEV -h localhost -p 5432"
+          initialDelaySeconds: 10
+          periodSeconds: 5
         env:
         - name: POSTGRES_DB
           valueFrom:
@@ -157,6 +165,14 @@ spec:
         ports:
         - containerPort: 8081
           name: lc-api
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "nc -zv $DB_HOST 5432"
+          initialDelaySeconds: 10
+          periodSeconds: 5
         volumeMounts:
         - name: api-persistent-storage
           mountPath: /uploads
