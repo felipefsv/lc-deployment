@@ -363,7 +363,7 @@ spec:
             port:
               number: 80
       - pathType: Prefix
-        path: /api
+        path: /srv
         backend:
           service:
             name: lc-api-svc
