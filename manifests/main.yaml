@@ -88,6 +88,7 @@ spec:
           - "sh"
           - "-c"
           - |
+            export PATH=$PATH:/usr/lib/postgresql/10/bin;
             rm -rf /var/lib/postgresql/data/pgdata/*;
             mkdir -p /var/lib/postgresql/data/pgdata;
             chown -R postgres:postgres /var/lib/postgresql/data/pgdata;
