@@ -1,0 +1,363 @@
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lc
+
+---
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lc-config
+  namespace: lc
+data:
+  POSTGRES_DB_USER: postgres
+  POSTGRES_DB_NAME: lc_enrolamentos_os_DEV
+  POSTGRES_DB_HOST: postgres-svc
+
+---
+# Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: lc-secret
+  namespace: lc
+type: Opaque
+data:
+  POSTGRES_DB_PASSWORD: MTIzNDU2 #123456
+
+---
+# PersistentVolumeClaim para api
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lc-pvc
+  namespace: lc
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+
+---
+# StatefulSet do Postgres
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: lc
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:10
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: lc-secret
+              key: POSTGRES_DB_PASSWORD
+        volumeMounts:
+          - name: postgres-persistent-storage
+            mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-persistent-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "longhorn"
+      resources:
+        requests:
+          storage: 2Gi
+
+---
+# Deployment api
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lc-api
+  namespace: lc
+  labels:
+    app: lc-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lc-api
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lc-api
+    spec:
+      containers:
+      - image: felipefsv/api-lc
+        name: lc-api
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_HOST
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: lc-secret
+              key: POSTGRES_DB_PASSWORD
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_USER
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: lc-config
+              key: POSTGRES_DB_NAME
+        ports:
+        - hostPort: 8081
+          containerPort: 8081
+          name: lc-api
+        volumeMounts:
+        - name: api-persistent-storage
+          mountPath: /api/uploads
+        - name: api-persistent-storage
+          mountPath: /api/logs
+      volumes:
+      - name: api-persistent-storage
+        persistentVolumeClaim:
+          claimName: lc-pvc
+  
+---
+# Deployment admin
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lc-admin
+  namespace: lc
+  labels:
+    app: lc-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lc-admin
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lc-admin
+    spec:
+      containers:
+      - image: felipefsv/admin-lc
+        name: lc-admin
+        ports:
+        - hostPort: 80
+          containerPort: 80
+          name: lc-admin
+
+---
+
+# Deployment monitor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lc-monitor
+  namespace: lc
+  labels:
+    app: lc-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lc-monitor
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lc-monitor
+    spec:
+      containers:
+      - image: felipefsv/monitor-lc
+        name: lc-monitor
+        ports:
+        - hostPort: 81
+          containerPort: 80
+          name: lc-monitor
+
+---
+# Deployment oficina
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lc-oficina
+  namespace: lc
+  labels:
+    app: lc-oficina
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lc-oficina
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lc-oficina
+    spec:
+      containers:
+      - image: felipefsv/oficina-lc
+        name: lc-oficina
+        ports:
+        - hostPort: 82
+          containerPort: 80
+          name: lc-oficina
+
+---
+# Serviço para api
+apiVersion: v1
+kind: Service
+metadata:
+  name: lc-api-svc
+  namespace: lc
+spec:
+  clusterIP: None
+  selector:
+    app: lc-api
+  ports:
+  - port: 8081
+    targetPort: 8081
+
+---
+# Serviço para admin
+apiVersion: v1
+kind: Service
+metadata:
+  name: lc-admin-svc
+  namespace: lc
+spec:
+  clusterIP: None
+  selector:
+    app: lc-admin
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+# Serviço para monitor
+apiVersion: v1
+kind: Service
+metadata:
+  name: lc-monitor-svc
+  namespace: lc
+spec:
+  clusterIP: None
+  selector:
+    app: lc-monitor
+  ports:
+  - port: 81
+    targetPort: 81
+
+---
+# Serviço para oficina
+apiVersion: v1
+kind: Service
+metadata:
+  name: lc-oficina-svc
+  namespace: lc
+spec:
+  clusterIP: None
+  selector:
+    app: lc-oficina
+  ports:
+  - port: 82
+    targetPort: 82
+
+---
+# Serviço Headless para Postgres
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: lc
+spec:
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+
+---
+# Ingress para web apps
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lc-ingress
+  namespace: lc
+  labels:
+    app: lc-admin
+spec:
+  rules:
+  - host: "wp.18.211.103.145.sslip.io"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: lc-admin-svc
+            port:
+              number: 80
+      - pathType: Prefix
+        path: /monitor
+        backend:
+          service:
+            name: lc-monitor-svc
+            port:
+              number: 81
+      - pathType: Prefix
+        path: /oficina
+        backend:
+          service:
+            name: lc-oficina-svc
+            port:
+              number: 82
+      - pathType: Prefix
+        path: /api
+        backend:
+          service:
+            name: lc-api-svc
+            port:
+              number: 8081
