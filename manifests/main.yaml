@@ -28,19 +28,19 @@ data:
   POSTGRES_DB_PASSWORD: MTIzNDU2 #123456
 
 ---
-# PersistentVolumeClaim para api
+# PersistentVolumeClaim para postgres
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: lc-pvc
+  name: postgres-pvc
   namespace: lc
 spec:
-  resources:
-    requests:
-      storage: 5Gi
   accessModes:
     - ReadWriteMany
   storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
 
 ---
 # StatefulSet do Postgres
@@ -95,7 +95,7 @@ spec:
       storageClassName: "longhorn"
       resources:
         requests:
-          storage: 2Gi
+          storage: 1Gi
 
 # ---
 # # Deployment api
