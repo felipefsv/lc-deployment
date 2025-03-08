@@ -84,9 +84,21 @@ spec:
             secretKeyRef:
               name: lc-secret
               key: POSTGRES_DB_PASSWORD
+        command:
+          - "sh"
+          - "-c"
+          - |
+            rm -rf /var/lib/postgresql/data/pgdata/*;
+            mkdir -p /var/lib/postgresql/data/pgdata;
+            chown -R postgres:postgres /var/lib/postgresql/data/pgdata;
+            if [ ! -s /var/lib/postgresql/data/pgdata/PG_VERSION ]; then
+              su - postgres -c "initdb -D /var/lib/postgresql/data/pgdata";
+            fi
+        securityContext:
+          runAsUser: 0        
         volumeMounts:
           - name: postgres-persistent-storage
-            mountPath: /var/lib/postgresql/data
+            mountPath: /var/lib/postgresql/data/pgdata
   volumeClaimTemplates:
   - metadata:
       name: postgres-persistent-storage
