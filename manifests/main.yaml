@@ -40,7 +40,7 @@ spec:
   storageClassName: longhorn
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
 
 ---
 # StatefulSet do Postgres
@@ -85,17 +85,17 @@ spec:
               name: lc-secret
               key: POSTGRES_DB_PASSWORD       
         volumeMounts:
-          - name: postgres-persistent-storage
+          - name: postgres-pvc
             mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-persistent-storage
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "longhorn"
-      resources:
-        requests:
-          storage: 1Gi
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: postgres-persistent-storage
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     storageClassName: "longhorn"
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
 
 # ---
 # # Deployment api
