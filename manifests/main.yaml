@@ -196,7 +196,6 @@ spec:
           name: lc-admin
 
 ---
-
 # Deployment monitor
 apiVersion: apps/v1
 kind: Deployment
