@@ -264,7 +264,7 @@ spec:
   selector:
     app: lc-api
   ports:
-  - port: 8081
+  - port: 80
     targetPort: 8081
 
 ---
@@ -368,4 +368,4 @@ spec:
           service:
             name: lc-api-svc
             port:
-              number: 8081
+              number: 80
