@@ -337,20 +337,20 @@ spec:
             name: lc-admin-svc
             port:
               number: 80
-      # - pathType: Prefix
-      #   path: /monitor
-      #   backend:
-      #     service:
-      #       name: lc-monitor-svc
-      #       port:
-      #         number: 81
-      # - pathType: Prefix
-      #   path: /oficina
-      #   backend:
-      #     service:
-      #       name: lc-oficina-svc
-      #       port:
-      #         number: 82
+      - pathType: Prefix
+        path: /monitor
+        backend:
+          service:
+            name: lc-monitor-svc
+            port:
+              number: 81
+      - pathType: Prefix
+        path: /oficina
+        backend:
+          service:
+            name: lc-oficina-svc
+            port:
+              number: 82
       # - pathType: Prefix
       #   path: /api
       #   backend:
