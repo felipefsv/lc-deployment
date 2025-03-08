@@ -260,7 +260,7 @@ metadata:
   name: lc-api-svc
   namespace: lc
 spec:
-  clusterIP: None
+  type: ClusterIP
   selector:
     app: lc-api
   ports:
