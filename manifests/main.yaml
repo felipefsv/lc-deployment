@@ -35,12 +35,12 @@ metadata:
   name: postgres-pvc
   namespace: lc
 spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn
   resources:
     requests:
       storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
 
 ---
 # StatefulSet do Postgres
@@ -85,8 +85,12 @@ spec:
               name: lc-secret
               key: POSTGRES_DB_PASSWORD       
         volumeMounts:
-          - name: postgres-pvc
+          - name: postgres-persistent-storage
             mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
   # volumeClaimTemplates:
   # - metadata:
   #     name: postgres-persistent-storage
