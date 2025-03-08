@@ -82,7 +82,7 @@ spec:
         image: postgres:10
         ports:
         - containerPort: 5432
-          name: postgres-svc
+          name: postgres
         readinessProbe:
           exec:
             command:
@@ -170,7 +170,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - "nc -zv $DB_HOST 5432"
+            - "curl -s $DB_HOST:5432 >/dev/null"
           initialDelaySeconds: 10
           periodSeconds: 5
         volumeMounts:
